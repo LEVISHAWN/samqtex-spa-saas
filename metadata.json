@@ -1,0 +1,5 @@
+{
+  "name": "SamQtex Spa SaaS",
+  "description": "A multi-tenant salon management platform with AI stylist recommendations, worker portals, and admin dashboards.",
+  "requestFramePermissions": []
+}

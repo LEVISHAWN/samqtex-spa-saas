@@ -4,13 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node --import tsx server.ts",
+    "dev": "SMTP_HOST=smtp.gmail.com SMTP_PORT=465 SMTP_SECURE=true SMTP_USER=samqtexsq@gmail.com SMTP_PASS=mislggscqnssfqgm node --import tsx server.ts",
     "start-email": "SMTP_HOST=smtp.gmail.com SMTP_PORT=465 SMTP_SECURE=true SMTP_USER=samqtexsq@gmail.com SMTP_PASS=mislggscqnssfqgm node --import tsx server.ts",
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
-    "start": "node server.ts"
+    "start": "SMTP_HOST=smtp.gmail.com SMTP_PORT=465 SMTP_SECURE=true SMTP_USER=samqtexsq@gmail.com SMTP_PASS=mislggscqnssfqgm node --import tsx server.ts"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",

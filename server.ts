@@ -841,6 +841,32 @@ async function startServer() {
     }
   });
 
+  app.post('/api/booking', async (req: any, res: any) => {
+    try {
+      const { name, email, service, date, time, notes } = req.body;
+      
+      const emailBody = `New Booking Request:
+      
+Name: ${name}
+Email: ${email}
+Service: ${service}
+Date: ${date}
+Time: ${time}
+Notes: ${notes || 'No notes provided'}
+Tenant ID: ${req.tenantId || '1'}`;
+
+      await sendEmail({
+        subject: `New Booking Request from ${name}`,
+        text: emailBody,
+      });
+
+      // Send back clean JSON so the frontend doesn't throw a parsing error
+      return res.status(200).json({ success: true, message: 'Booking email sent!' });
+    } catch (error: any) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
   app.post("/api/orders", guestMiddleware, async (req: any, res) => {
     try {
       const { items, total_amount, payment_method, client_name, client_phone, type } = req.body;

@@ -841,27 +841,50 @@ async function startServer() {
     }
   });
 
+  // Unified booking handler — supports both the legacy web-form fields
+  // (name, email, service, date, time, notes) and the Vercel-style quick
+  // fields (name, phone, request). Both sets of fields are optional except
+  // for `name` which is always required.
   app.post('/api/booking', async (req: any, res: any) => {
     try {
-      const { name, email, service, date, time, notes } = req.body;
-      
-      const emailBody = `New Booking Request:
-      
-Name: ${name}
-Email: ${email}
-Service: ${service}
-Date: ${date}
-Time: ${time}
-Notes: ${notes || 'No notes provided'}
-Tenant ID: ${req.tenantId || '1'}`;
+      // Support both field naming conventions
+      const {
+        name,
+        email,
+        service,
+        date,
+        time,
+        notes,
+        // Vercel-handler-style aliases
+        phone,
+        request: requestNotes,
+      } = req.body;
+
+      if (!name) {
+        return res.status(400).json({ success: false, error: 'Name is required.' });
+      }
+
+      // Build an email body from whichever fields were submitted
+      const lines: string[] = [
+        `Full Name : ${name}`,
+      ];
+      if (phone)        lines.push(`Phone     : ${phone}`);
+      if (email)        lines.push(`Email     : ${email}`);
+      if (service)      lines.push(`Service   : ${service}`);
+      if (date)         lines.push(`Date      : ${date}`);
+      if (time)         lines.push(`Time      : ${time}`);
+      const notesText = requestNotes || notes;
+      if (notesText)    lines.push(`Notes     : ${notesText}`);
+      lines.push(`Tenant ID : ${req.tenantId || '1'}`);
+
+      const emailBody = `New Booking Request:\n\n${lines.join('\n')}`;
 
       await sendEmail({
         subject: `New Booking Request from ${name}`,
         text: emailBody,
       });
 
-      // Send back clean JSON so the frontend doesn't throw a parsing error
-      return res.status(200).json({ success: true, message: 'Booking email sent!' });
+      return res.status(200).json({ success: true, message: 'Booking email sent successfully!' });
     } catch (error: any) {
       return res.status(500).json({ success: false, error: error.message });
     }
